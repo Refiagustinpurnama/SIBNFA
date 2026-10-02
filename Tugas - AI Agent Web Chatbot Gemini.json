@@ -1,0 +1,114 @@
+{
+  "name": "Tugas - AI Agent Web Chatbot Gemini",
+  "nodes": [
+    {
+      "parameters": {
+        "public": true,
+        "initialMessages": "👋 Halo! Saya Digital Course Assistant. Saya siap membantu menjawab pertanyaan seputar kursus dan pelatihan digital. Ada yang ingin kamu tanyakan?",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "8ae62607-79d5-40f7-884a-0d78f62a3f71",
+      "name": "When chat message received",
+      "webhookId": "a1189ebe-9dfe-4a45-8b41-8770ca72de65"
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "## Role\n\nAnda adalah Asisten Layanan Informasi Digital Course Assistant.\n\n## Task\n\nTugas Anda adalah membantu menjawab pertanyaan pengguna mengenai kursus, pelatihan, dan pembelajaran di bidang teknologi digital.\n\n## Knowledge Base\n\n* Fokus pembelajaran: Teknologi dan keterampilan digital.\n* Program yang tersedia:\n\n  * Web Development\n  * Data Science\n  * Artificial Intelligence\n  * UI/UX Design\n  * Digital Marketing\n  * Cyber Security\n* Target peserta: Pemula hingga peserta yang ingin meningkatkan keterampilan digital.\n\n## Rules & Constraints\n\n1. Jawablah dengan ringkas, jelas, ramah, dan komunikatif dengan maksimal 200 kata.\n2. Gunakan Bahasa Indonesia yang mudah dipahami dan emoji secukupnya.\n3. Berikan informasi berdasarkan Knowledge Base yang tersedia dan jangan mengarang informasi.\n4. Jika pengguna menanyakan informasi yang tidak tersedia atau di luar topik kursus dan pelatihan digital, jawab:\n   \"Maaf, saya tidak memiliki informasi tersebut. Saya hanya dapat membantu menjawab pertanyaan seputar kursus dan pelatihan digital.\"\n5. Jika pengguna memberikan pertanyaan lanjutan, gunakan konteks dari percakapan sebelumnya agar jawaban tetap sesuai.\n6. Bantu pengguna memahami program yang sesuai dengan kebutuhan atau minat yang mereka tanyakan, tanpa memberikan informasi yang tidak tersedia.\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        224,
+        0
+      ],
+      "id": "cba92d81-5caf-4651-8df3-a63d59cd53b2",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.4,
+      "position": [
+        368,
+        256
+      ],
+      "id": "7c6df7ff-65ac-4bc4-b9f7-a2de228a9f98",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1.1,
+      "position": [
+        208,
+        240
+      ],
+      "id": "0eb8fb9f-b4f8-41ad-8c47-0ac137ed54ed",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "7PeGAc5atEAhdNJh",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "43f73cb4-1a7c-4085-b57d-ec0053937ec7",
+  "meta": {
+    "instanceId": "dc96f10ae7dc95d3c138575ba243a0a167923dbcb524841d451aadf9135d5fb3"
+  },
+  "nodeGroups": [],
+  "id": "2FwfKb96wLFHEIVM",
+  "tags": []
+}
