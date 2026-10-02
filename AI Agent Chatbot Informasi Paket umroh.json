@@ -1,0 +1,160 @@
+{
+  "name": "AI Agent Chatbot Informasi Paket umroh",
+  "nodes": [
+    {
+      "parameters": {
+        "public": true,
+        "initialMessages": "🕋 Halo! Selamat datang di Asisten Paket Umrah.\nAda yang ingin kamu tanyakan tentang paket, harga, durasi, hotel, atau fasilitas umrah? 😊",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "ec53752a-3ad3-4164-9638-df9127fb4faf",
+      "name": "When chat message received",
+      "webhookId": "f304e53a-e8b8-4613-a822-7be3f04d40b4"
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "=## Role\n\nAnda adalah Asisten Informasi Paket Umrah yang membantu pengguna mendapatkan informasi mengenai paket umrah yang tersedia.\n\n## Task\n\nTugas Anda adalah menjawab pertanyaan pengguna mengenai nama paket, harga, durasi, hotel, dan fasilitas paket umrah.\n\n## Data Source\n\nGunakan Google Sheets sebagai sumber utama untuk mencari informasi paket umrah.\n\n## Rules & Constraints\n\n1. Jika pengguna menanyakan paket, harga, durasi, hotel, atau fasilitas, gunakan Google Sheets untuk mencari data.\n2. Jangan mengarang harga atau informasi paket yang tidak tersedia di Google Sheets.\n3. Jika data tidak ditemukan, sampaikan bahwa informasi tersebut belum tersedia.\n4. Jawab menggunakan Bahasa Indonesia yang jelas, singkat, dan mudah dipahami.\n5. Jangan menampilkan data mentah, JSON, kode program, atau hasil Google Sheets secara langsung kepada pengguna.\n6. Gunakan memory percakapan untuk memahami konteks pertanyaan sebelumnya.\n7. Gunakan emoji secukupnya.\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        224,
+        0
+      ],
+      "id": "2f982367-4b9a-4c8c-ba0c-bf8a944ce8b8",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-3-flash-preview",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        144,
+        224
+      ],
+      "id": "8519d6f1-43de-40f6-8bf6-e119c96e9461",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "7PeGAc5atEAhdNJh",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        368,
+        240
+      ],
+      "id": "0ab9f1ed-1136-456c-87eb-bfdced1f2581",
+      "name": "Window Buffer Memory"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "19WSWe0P2c16nJCIqdsDprhhR0KqTE5tNQMzYrzDHL_U",
+          "mode": "list",
+          "cachedResultName": "Data paket umrah",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/19WSWe0P2c16nJCIqdsDprhhR0KqTE5tNQMzYrzDHL_U/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/19WSWe0P2c16nJCIqdsDprhhR0KqTE5tNQMzYrzDHL_U/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        608,
+        160
+      ],
+      "id": "8490736b-1fb3-4376-9d4c-b53e1a79b600",
+      "name": "Get row(s) in sheet in Google Sheets",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "QHA1ZvfPocNCeliy",
+          "name": "Google Sheets account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Window Buffer Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet in Google Sheets": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "5eaae004-6c89-444d-9fd7-382d34cbf231",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "dc96f10ae7dc95d3c138575ba243a0a167923dbcb524841d451aadf9135d5fb3"
+  },
+  "nodeGroups": [],
+  "id": "6pNjk1umyHZJKIiK",
+  "tags": []
+}
