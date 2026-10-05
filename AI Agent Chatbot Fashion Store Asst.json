@@ -1,0 +1,160 @@
+{
+  "name": "AI Agent Chatbot Fashion Store Asst",
+  "nodes": [
+    {
+      "parameters": {
+        "public": true,
+        "initialMessages": "👋 Halo! Selamat datang di Fashion Store Assistant 👗\nSaya siap membantu kamu mencari informasi produk fashion, harga, ukuran, warna, dan bahan.\nAda produk yang ingin kamu tanyakan? 😊",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "a4db3266-d843-472f-9ef8-5b806c0dea54",
+      "name": "When chat message received",
+      "webhookId": "d0339d78-1d9e-438e-9c32-41a4b7ced82a"
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "=## Role\n\nAnda adalah Fashion Store Assistant yang membantu pengguna mendapatkan informasi mengenai produk fashion.\n\n## Task\n\nTugas Anda adalah menjawab pertanyaan pengguna mengenai produk, harga, kategori, ukuran, warna, dan bahan produk fashion yang tersedia.\n\n## Data Source\n\nGunakan Google Sheets sebagai sumber utama untuk mencari informasi produk fashion.\n\n## Rules & Constraints\n\n1. Jika pengguna menanyakan produk, harga, ukuran, warna, bahan, atau kategori, gunakan tool Google Sheets untuk mengambil data.\n2. Jangan mengarang informasi produk yang tidak tersedia di Google Sheets.\n3. Jika produk atau informasi yang ditanyakan tidak ditemukan, sampaikan dengan jujur bahwa data tersebut tidak tersedia.\n4. Jawablah menggunakan Bahasa Indonesia yang jelas, ringkas, ramah, dan mudah dipahami.\n5. Gunakan emoji secukupnya.\n6. Jangan menampilkan data mentah, JSON, kode program, atau hasil Google Sheets secara langsung kepada pengguna.\n7. Gunakan memory percakapan untuk memahami konteks pertanyaan sebelumnya.\n8. Maksimal 200 kata dalam setiap jawaban."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        224,
+        0
+      ],
+      "id": "4edbacc4-98f2-4259-b959-8e2d8af2e39e",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-3-flash-preview",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        144,
+        224
+      ],
+      "id": "3a2b8a38-8d9c-450d-b4cb-8e910a87f5bf",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "7PeGAc5atEAhdNJh",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        336,
+        224
+      ],
+      "id": "79a4cb44-0e9f-44ca-bab7-288048ae1c10",
+      "name": "Window Buffer Memory"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "19vnO785S-xwfJKmJdCx6qeX9auYx4mFFPTUzn2tBY3I",
+          "mode": "list",
+          "cachedResultName": "Data Harga Fashion Store",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/19vnO785S-xwfJKmJdCx6qeX9auYx4mFFPTUzn2tBY3I/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/19vnO785S-xwfJKmJdCx6qeX9auYx4mFFPTUzn2tBY3I/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        608,
+        160
+      ],
+      "id": "5be0437e-2e73-4142-96d9-1f604819c415",
+      "name": "Get row(s) in sheet in Google Sheets",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "QHA1ZvfPocNCeliy",
+          "name": "Google Sheets account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Window Buffer Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet in Google Sheets": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "1c8e4864-55fb-4aef-a4f6-48e1aaed8adc",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "dc96f10ae7dc95d3c138575ba243a0a167923dbcb524841d451aadf9135d5fb3"
+  },
+  "nodeGroups": [],
+  "id": "Mw14hLsEgOqO5Eeh",
+  "tags": []
+}
