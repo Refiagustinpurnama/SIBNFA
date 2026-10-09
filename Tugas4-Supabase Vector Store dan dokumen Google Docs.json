@@ -1,0 +1,303 @@
+{
+  "name": "Tugas4-Supabase Vector Store dan dokumen Google Docs",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "e6c2c5f5-243a-4743-b88a-0bfaeefc06cb",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "10iOJSQe4c5Q1zkprtpOpmX0V9i7bgxYy0k11RbZoHRQ",
+          "mode": "list",
+          "cachedResultName": "Panduan_Dasar_Penulisan_Skripsi_GDocs",
+          "cachedResultUrl": "https://docs.google.com/document/d/10iOJSQe4c5Q1zkprtpOpmX0V9i7bgxYy0k11RbZoHRQ/edit?usp=drivesdk"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        192,
+        0
+      ],
+      "id": "4a6c354c-ef7a-4b0f-85a7-f0cb7eb5b76d",
+      "name": "Download file",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "JAxRHnGnWAjZsTnY",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "insert",
+        "tableName": {
+          "__rl": true,
+          "value": "documents",
+          "mode": "list",
+          "cachedResultName": "documents"
+        },
+        "options": {
+          "queryName": "match_documents"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreSupabase",
+      "typeVersion": 1.3,
+      "position": [
+        416,
+        0
+      ],
+      "id": "3eb52517-cccf-45cd-a8c3-87d5b278595f",
+      "name": "Supabase Vector Store",
+      "credentials": {
+        "supabaseApi": {
+          "id": "4Vumso685vM9bLt3",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.embeddingsGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        416,
+        208
+      ],
+      "id": "9013e57a-e2cb-453f-b80c-84b38cb98a6c",
+      "name": "Embeddings Google Gemini",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "7PeGAc5atEAhdNJh",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "dataType": "binary",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "typeVersion": 1.1,
+      "position": [
+        576,
+        160
+      ],
+      "id": "3bbe9cc4-ab53-4ed6-ac19-320546ce3e70",
+      "name": "Default Data Loader"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-flash",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1.1,
+      "position": [
+        -32,
+        688
+      ],
+      "id": "7745c718-a4e3-41b6-bde1-93672710ea77",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "7PeGAc5atEAhdNJh",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "## Role\n\nAnda adalah Asisten Penulisan Skripsi yang membantu mahasiswa memahami dasar-dasar penulisan skripsi.\n\n## Task\n\nJawab pertanyaan pengguna mengenai struktur skripsi, tahapan penyusunan, rumusan masalah, tinjauan pustaka, metode penelitian, pengumpulan data, serta etika penelitian dan sitasi.\n\n## Data Source\n\nGunakan tool pencarian_skripsi untuk mencari informasi yang relevan dari dokumen Panduan Dasar Penulisan Skripsi yang telah disimpan di Supabase Vector Store.\n\n## Rules & Constraints\n\n1. Gunakan tool pencarian_skripsi untuk mencari informasi sebelum menjawab pertanyaan yang berkaitan dengan materi skripsi.\n2. Jawablah berdasarkan informasi yang ditemukan dalam dokumen.\n3. Jangan mengarang informasi yang tidak tersedia dalam sumber data.\n4. Jika informasi tidak ditemukan, sampaikan dengan jujur bahwa informasi tersebut tidak tersedia dalam dokumen.\n5. Gunakan Bahasa Indonesia yang jelas, ringkas, ramah, dan mudah dipahami.\n6. Gunakan konteks percakapan sebelumnya jika masih relevan.\n7. Jangan menampilkan data mentah, embedding, JSON, atau kode program kepada pengguna.\n8. Maksimal 200 kata dalam setiap jawaban.\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        64,
+        464
+      ],
+      "id": "b35dd280-a017-444c-b11e-cb6f98119654",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "public": true,
+        "initialMessages": "👋 Halo! Selamat datang di Asisten Penulisan Skripsi 📚\nSaya siap membantu menjawab pertanyaan seputar penulisan skripsi, seperti struktur skripsi, rumusan masalah, tinjauan pustaka, metode penelitian, dan penyusunan kesimpulan.\n\nSilakan tanyakan apa yang ingin kamu ketahui 😊",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.5,
+      "position": [
+        -176,
+        464
+      ],
+      "id": "91bfef6a-8c75-4461-931a-616ce85ca902",
+      "name": "When chat message received",
+      "webhookId": "a6aa5882-5d0f-49be-8687-20da0046eb03"
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.4,
+      "position": [
+        144,
+        672
+      ],
+      "id": "9712583a-b90e-43d8-8e53-7d898d02afbf",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "mode": "retrieve-as-tool",
+        "toolDescription": "Gunakan tool ini untuk mencari informasi dari dokumen Panduan Dasar Penulisan Skripsi yang tersimpan di database. Gunakan hasil pencarian untuk menjawab pertanyaan pengguna yang berkaitan dengan penulisan skripsi berdasarkan isi dokumen.",
+        "tableName": {
+          "__rl": true,
+          "value": "documents",
+          "mode": "list",
+          "cachedResultName": "documents"
+        },
+        "includeDocumentMetadata": false,
+        "options": {
+          "queryName": "match_documents"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreSupabase",
+      "typeVersion": 1.3,
+      "position": [
+        416,
+        576
+      ],
+      "id": "c9c0cba6-c682-4a80-aab7-75a19e9036f6",
+      "name": "panduan_skripsi",
+      "credentials": {
+        "supabaseApi": {
+          "id": "4Vumso685vM9bLt3",
+          "name": "Supabase account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Download file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download file": {
+      "main": [
+        [
+          {
+            "node": "Supabase Vector Store",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings Google Gemini": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Supabase Vector Store",
+            "type": "ai_embedding",
+            "index": 0
+          },
+          {
+            "node": "panduan_skripsi",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Default Data Loader": {
+      "ai_document": [
+        [
+          {
+            "node": "Supabase Vector Store",
+            "type": "ai_document",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "panduan_skripsi": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "f6d4fda0-11e1-4ab4-8ae8-267191b60700",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "dc96f10ae7dc95d3c138575ba243a0a167923dbcb524841d451aadf9135d5fb3"
+  },
+  "nodeGroups": [],
+  "id": "XReLLrcf8JfCp0BU",
+  "tags": []
+}
